@@ -1,6 +1,6 @@
 import {
   Controller,
-  Post, Get, Patch,
+  Post, Get, Patch, Delete,
   UploadedFiles,
   UseInterceptors,
   Body, Param,
@@ -60,4 +60,10 @@ export class ProductsController {
     }
     return product
   }
+
+  @Delete(':id')
+  async deleteProduct(@Param('id') id: string) {
+    return this.productsService.deleteProduct(Number(id))
+  }
+
 }

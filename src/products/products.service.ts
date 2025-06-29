@@ -180,4 +180,15 @@ export class ProductsService {
 
     return data
   }
+
+  async deleteProduct(id: number) {
+    const supabase = getSupabaseClient()
+    const { data, error } = await supabase.from('products').delete().eq('id', id).select()
+
+    if (error) throw new Error(`Delete failed: ${error.message}`)
+    if (!data || data.length === 0) throw new Error('Product not found.')
+
+    return { message: 'Product deleted', product: data[0] }
+  }
+
 }
