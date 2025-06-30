@@ -19,14 +19,12 @@ export class CategoryService {
       throw new Error(`Delete failed: ${deleteError.message}`)
     }
 
-    const { data, error: insertError } = await supabase.from('category').insert(categories)
+    const { error: insertError } = await supabase.from('category').insert(categories)
 
     if (insertError) {
       console.error('Insert error:', insertError)
       throw new Error(`Insert failed: ${insertError.message}`)
     }
-
-    console.log(data)
 
     return { message: 'Categories replaced' }
   }
