@@ -16,6 +16,12 @@ export class ProductDto {
   @IsString()
   description: string
 
+  @IsString()
+  size: string
+
+  @IsString()
+  color: string
+
   @IsOptional()
   @IsString()
   existingMainImg: string

@@ -61,6 +61,8 @@ export class ProductsService {
           category: body.category,
           stock: Number(body.stock),
           description: body.description,
+          size: body.size,
+          color: body.color,
           mainImg: mainImageUrl,
           images: imageUrls,
         },
@@ -138,6 +140,8 @@ export class ProductsService {
       stock: number
       category: string
       description: string
+      size: string
+      color: string
       mainImg: string
       images: string[]
     } = {
@@ -146,9 +150,13 @@ export class ProductsService {
       stock: Number(body.stock),
       category: body.category,
       description: body.description,
+      size: body.size,
+      color: body.color,
       mainImg: mainImageUrl,
       images: imageUrls,
     }
+
+    console.log(updateData)
 
     const { data, error } = await supabase
       .from('products')
