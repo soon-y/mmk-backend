@@ -27,6 +27,7 @@ export class UsersService {
         password: hashedPassword,
         avatar_url: `https://i.pravatar.cc/1000?u=${userId}`,
         created_at: new Date(),
+        admin: false,
       },
     ])
 
@@ -58,7 +59,7 @@ export class UsersService {
 
   async getAllMembers() {
     const supabase = getSupabaseClient()
-    const { data, error } = await supabase.from('members').select('*').order('id', { ascending: true })
+    const { data, error } = await supabase.from('members').select('*').order('created_at', { ascending: true })
     if (error) throw new Error(error.message)
     return data
   }
