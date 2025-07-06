@@ -17,34 +17,30 @@ export class ProductsController {
   @Post()
   @UseInterceptors(
     FileFieldsInterceptor([
-      { name: 'files', maxCount: 10 },
-      { name: 'mainImg', maxCount: 1 },
+      { name: 'files', maxCount: 50 },
     ]),
   )
   async createProduct(
-    @UploadedFiles() files: { files?: Express.Multer.File[], mainImg?: Express.Multer.File[] },
+    @UploadedFiles() files: { files?: Express.Multer.File[] },
     @Body() body: ProductDto,
   ) {
     const productFiles = files.files || []
-    const mainImageFile = files.mainImg ? files.mainImg[0] : null
-    return this.productsService.createProductWithImages(body, productFiles, mainImageFile)
+    return this.productsService.createProductWithImages(body, productFiles)
   }
 
   @Patch(':id')
   @UseInterceptors(
     FileFieldsInterceptor([
-      { name: 'files', maxCount: 10 },
-      { name: 'mainImg', maxCount: 1 },
+      { name: 'files', maxCount: 50 },
     ]),
   )
   async updateProduct(
     @Param('id') id: string,
-    @UploadedFiles() files: { files?: Express.Multer.File[], mainImg?: Express.Multer.File[] },
+    @UploadedFiles() files: { files?: Express.Multer.File[] },
     @Body() body: ProductDto,
   ) {
     const productFiles = files.files || []
-    const mainImageFile = files.mainImg ? files.mainImg[0] : null
-    return this.productsService.updateProduct(Number(id), body, productFiles, mainImageFile)
+    return this.productsService.updateProduct(Number(id), body, productFiles)
   }
 
   @Get()

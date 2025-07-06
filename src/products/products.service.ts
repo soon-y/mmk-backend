@@ -7,7 +7,6 @@ export class ProductsService {
   async createProductWithImages(
     body: ProductDto,
     files: Express.Multer.File[],
-    mainImg: Express.Multer.File | null
   ) {
     const supabase = getSupabaseClient()
     const imageUrls: string[] = []
@@ -31,39 +30,21 @@ export class ProductsService {
       imageUrls.push(data.publicUrl)
     }
 
-    let mainImageUrl: string | null = null
-    if (mainImg) {
-      const ext = mainImg.originalname.split('.').pop()
-      const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${ext}`
-
-      const { error } = await supabase.storage
-        .from('product-img')
-        .upload(fileName, mainImg.buffer, {
-          contentType: mainImg.mimetype,
-          upsert: true,
-        })
-
-      if (error) throw new Error(`Main image upload failed: ${error.message}`)
-
-      const { data } = supabase.storage
-        .from('product-img')
-        .getPublicUrl(fileName)
-
-      mainImageUrl = data.publicUrl
-    }
-
     const { data: productData, error: dbError } = await supabase
       .from('products')
       .insert([
         {
           name: body.name,
-          price: Number(body.price),
           category: body.category,
-          stock: Number(body.stock),
-          description: body.description,
+          price: Number(body.price),
           size: body.size,
           color: body.color,
-          mainImg: mainImageUrl,
+          colorHex: body.colorHex,
+          stock: body.stock,
+          description: body.description,
+          material: body.material,
+          measurement: body.measurement,
+          imagesCount: body.imagesCount,
           images: imageUrls,
         },
       ])
@@ -81,10 +62,16 @@ export class ProductsService {
     id: number,
     body: ProductDto,
     files: Express.Multer.File[],
-    mainImg: Express.Multer.File | null
   ) {
     const supabase = getSupabaseClient()
-    const imageUrls: string[] = []
+
+    const existingImagesUrls: string[] = body.existingImages
+    const originalOrderCount: string[] = body.originalOrderCount.split('/')
+    const newOrderCount: string[] = body.newOrderCount.split('/')
+    const newImageUrls: string[] = []
+    let imageUrls: string[] = []
+
+    console.log('exisint: ' + existingImagesUrls)
 
     if (files.length > 0) {
       for (const file of files) {
@@ -103,56 +90,36 @@ export class ProductsService {
           .from('product-img')
           .getPublicUrl(fileName)
 
-        imageUrls.push(data.publicUrl)
+        newImageUrls.push(data.publicUrl)
       }
     }
-
-    const existingImages = Array.isArray(body.existingImages) ? body.existingImages : body.existingImages ? [body.existingImages] : []
-
-    imageUrls.push(...existingImages)
-
-    let mainImageUrl: string | null = null
-    if (mainImg) {
-      const ext = mainImg.originalname.split('.').pop()
-      const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${ext}`
-
-      const { error } = await supabase.storage
-        .from('product-img')
-        .upload(fileName, mainImg.buffer, {
-          contentType: mainImg.mimetype,
-          upsert: true,
-        })
-
-      if (error) throw new Error(`Main image upload failed: ${error.message}`)
-
-      const { data } = supabase.storage
-        .from('product-img')
-        .getPublicUrl(fileName)
-
-      mainImageUrl = data.publicUrl
-    } else {
-      mainImageUrl = body.existingMainImg
-    }
+    imageUrls = insertInOrder(existingImagesUrls, newImageUrls, originalOrderCount, newOrderCount,)
 
     const updateData: {
       name: string
-      price: number
-      stock: number
       category: string
-      description: string
+      price: number
       size: string
       color: string
-      mainImg: string
+      colorHex: string
+      stock: string
+      description: string
+      material: string
+      measurement: string,
+      imagesCount: string
       images: string[]
     } = {
       name: body.name,
-      price: Number(body.price),
-      stock: Number(body.stock),
       category: body.category,
-      description: body.description,
+      price: Number(body.price),
       size: body.size,
       color: body.color,
-      mainImg: mainImageUrl,
+      colorHex: body.colorHex,
+      stock: body.stock,
+      description: body.description,
+      material: body.material,
+      measurement: body.measurement,
+      imagesCount: body.imagesCount,
       images: imageUrls,
     }
 
@@ -199,4 +166,36 @@ export class ProductsService {
     return { message: 'Product deleted', product: data[0] }
   }
 
+}
+
+function insertInOrder<T>(
+  originalArray: T[],
+  newArray: T[],
+  originalCount: (string | number)[],
+  newCount: (string | number)[]
+): T[] {
+
+  console.log(originalArray)
+
+  const result: T[] = []
+  let originalIndex = 0
+  let newIndex = 0
+
+  const arrayLenth = Math.max(originalCount.length, newCount.length)
+
+  for (let i = 0; i < arrayLenth; i++) {
+    const count = Number(originalCount[i] ?? 0)
+    const insertCount = Number(newCount[i] ?? 0)
+
+    result.push(...originalArray.slice(originalIndex, originalIndex + count))
+    originalIndex += count
+
+    result.push(...newArray.slice(newIndex, newIndex + insertCount))
+    newIndex += insertCount
+  }
+
+  result.push(...originalArray.slice(originalIndex))
+  result.push(...newArray.slice(newIndex))
+
+  return result
 }

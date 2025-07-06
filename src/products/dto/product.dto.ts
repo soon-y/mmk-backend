@@ -4,17 +4,11 @@ export class ProductDto {
   @IsString()
   name: string
 
-  @IsNumber()
-  price: number
-
-  @IsNumber()
-  stock: number
-
   @IsString()
   category: string
 
-  @IsString()
-  description: string
+  @IsNumber()
+  price: number
 
   @IsString()
   size: string
@@ -22,12 +16,33 @@ export class ProductDto {
   @IsString()
   color: string
 
-  @IsOptional()
   @IsString()
-  existingMainImg: string
+  colorHex: string
+
+  @IsString()
+  stock: string
+
+  @IsString()
+  description: string
+
+  @IsString()
+  material: string
+
+  @IsString()
+  measurement: string
+
+  @IsString()
+  imagesCount: string
 
   @IsOptional()
   @IsString()
   existingImages: string[]
-  
+
+  @IsOptional()
+  @IsString()
+  originalOrderCount: string
+
+  @IsOptional()
+  @IsString()
+  newOrderCount: string
 }
