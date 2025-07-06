@@ -13,6 +13,10 @@ export class CategoryDto {
   @IsBoolean()
   optGroup: boolean
 
+  @IsOptional()
+  @IsString()
+  image: string
+
   @ValidateIf((obj) => obj.groupID !== null)
   @IsNumber()
   @IsOptional()

@@ -2,7 +2,10 @@ import {
   Controller,
   Post, Get,
   Body,
+  UploadedFiles,
+  UseInterceptors,
 } from '@nestjs/common'
+import { AnyFilesInterceptor } from '@nestjs/platform-express'
 import { CategoryService } from './category.service'
 import { CategoryDto } from './dto/category.dto'
 
@@ -11,8 +14,13 @@ export class CategoryController {
   constructor(private readonly categoryService: CategoryService) { }
 
   @Post('replace')
-  async replaceCategories(@Body() categories: CategoryDto[]) {
-    return this.categoryService.replaceAll(categories)
+  @UseInterceptors(AnyFilesInterceptor())
+  async replaceCategories(
+    @UploadedFiles() files: Express.Multer.File[],
+    @Body() body: { categories: string },
+  ) {
+    const categories: CategoryDto[] = JSON.parse(body.categories)
+    return this.categoryService.replaceAll(categories, files)
   }
 
   @Get()
