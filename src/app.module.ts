@@ -5,6 +5,7 @@ import { AppService } from './app.service'
 import { ProductsModule } from './products/products.module'
 import { CategoryModule } from './category/category.module'
 import { AuthModule } from './auth/auth.module'
+import { BannerModule } from './banner/banner.module'
 
 @Module({
   imports: [
@@ -13,7 +14,8 @@ import { AuthModule } from './auth/auth.module'
     }),
     ProductsModule,
     CategoryModule,
-    AuthModule,   
+    AuthModule,
+    BannerModule, 
   ],
   controllers: [AppController],
   providers: [AppService],
