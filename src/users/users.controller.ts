@@ -11,6 +11,16 @@ interface AuthenticatedRequest extends Request {
   }
 }
 
+interface CustomerAuthenticatedRequest extends Request {
+  user: {
+    email: string
+    firstName: string
+    lastName: string
+    created_at: Date
+  }
+}
+
+
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) { }
@@ -18,6 +28,12 @@ export class UsersController {
   @Get('me')
   @UseGuards(AuthGuard('jwt'))
   getProfile(@Request() req: AuthenticatedRequest) {
+    return req.user
+  }
+
+  @Get('customer')
+  @UseGuards(AuthGuard('jwt-customer'))
+  getCustomerProfile(@Request() req: CustomerAuthenticatedRequest) {
     return req.user
   }
 

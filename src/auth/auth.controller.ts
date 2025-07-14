@@ -17,4 +17,18 @@ export class AuthController {
     return this.authService.register(body.name, body.email, body.password)
   }
 
+  @Post('findCustomerByEmail')
+  async findCustomerByEmail(@Body() body: { email: string }) {
+    return this.authService.findCustomerByEmail(body.email)
+  }
+
+  @Post('registerCustomer')
+  async registerCustomer(@Body() body: { email: string, password: string, firstName: string, lastName: string }) {
+    return this.authService.registerCustomer(body.email, body.password, body.firstName, body.lastName)
+  }
+
+  @Post('loginCustomer')
+  async loginCustomer(@Body() body: { email: string, password: string }) {
+    return this.authService.loginCustomer(body.email, body.password)
+  }
 }

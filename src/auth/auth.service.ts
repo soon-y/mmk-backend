@@ -8,7 +8,7 @@ export class AuthService {
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService
-  ) {}
+  ) { }
 
   async login(email: string, password: string): Promise<{ access_token: string }> {
     const user = await this.usersService.findUserByEmail(email)
@@ -29,5 +29,30 @@ export class AuthService {
       throw new UnauthorizedException('Email already registered')
     }
     return this.usersService.createUser(name, email, password)
+  }
+
+  async findCustomerByEmail(email: string) {
+    const user = await this.usersService.findCustomerByEmail(email)
+    if (user) {
+      return true
+    }
+    return false
+  }
+
+  async registerCustomer(email: string, password: string, firstName: string, lastName: string) {
+    return this.usersService.createCustomer(email, password, firstName, lastName)
+  }
+
+  async loginCustomer(email: string, password: string): Promise<{ access_token: string }> {
+    const user = await this.usersService.findCustomerByEmail(email)
+    if (!user) throw new UnauthorizedException('User not found')
+
+    const isMatch = await bcrypt.compare(password, user.password)
+    if (!isMatch) throw new UnauthorizedException('Invalid credentials')
+
+    const payload = { sub: user.id, email: user.email }
+    const token = this.jwtService.sign(payload)
+
+    return { access_token: token }
   }
 }

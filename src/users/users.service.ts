@@ -63,4 +63,48 @@ export class UsersService {
     if (error) throw new Error(error.message)
     return data
   }
+
+
+  async findCustomerByEmail(email: string): Promise<any | null> {
+    const supabase = getSupabaseClient()
+    const { data, error } = await supabase.from('customer').select('*').eq('email', email).single()
+
+    if (error) return null
+    return data
+  }
+
+  async createCustomer(email: string, password: string, firstName: string, lastName: string, ) {
+    const supabase = getSupabaseClient()
+    const hashedPassword = await bcrypt.hash(password, 10)
+    const userId = uuidv4()
+
+    const { data, error } = await supabase.from('customer').insert([
+      {
+        id: userId,
+        email,
+        password: hashedPassword,
+        created_at: new Date(),
+        firstName,
+        lastName,
+      },
+    ])
+
+    if (error) {
+      throw new Error(error.message)
+    }
+    return data
+  }
+
+  async findCustomerById(id: string) {
+    const supabase = getSupabaseClient()
+    const { data, error } = await supabase.from('customer').select('*').eq('id', id).single()
+
+    console.log(data)
+
+    if (error) {
+      return null
+    }
+    return data
+  }
+
 }
