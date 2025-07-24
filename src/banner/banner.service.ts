@@ -31,8 +31,6 @@ export class BannerService {
       imageUrls[idFromField] = data.publicUrl
     }
 
-    console.log(banners)
-
     const updatedBanners = banners.map((item) => ({
       ...item, image: imageUrls[item.id] ?? item.image,
     }))
