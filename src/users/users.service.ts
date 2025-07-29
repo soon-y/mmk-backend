@@ -73,7 +73,7 @@ export class UsersService {
     return data
   }
 
-  async createCustomer(email: string, password: string, firstName: string, lastName: string, ) {
+  async createCustomer(email: string, password: string, firstName: string, lastName: string,) {
     const supabase = getSupabaseClient()
     const hashedPassword = await bcrypt.hash(password, 10)
     const userId = uuidv4()
@@ -89,6 +89,26 @@ export class UsersService {
       },
     ])
 
+    const { error: addrInsertionError } = await supabase.from('address').insert([
+      {
+        id: userId, firstName, lastName, select: true, index: 1
+      },
+    ])
+
+    if (addrInsertionError) {
+      throw new Error(addrInsertionError.message)
+    }
+
+    const { error: BiillingAddrInsertionError } = await supabase.from('billing').insert([
+      {
+        id: userId, firstName, lastName, select: true, index: 1
+      },
+    ])
+
+    if (BiillingAddrInsertionError) {
+      throw new Error(BiillingAddrInsertionError.message)
+    }
+
     if (error) {
       throw new Error(error.message)
     }
@@ -99,7 +119,88 @@ export class UsersService {
     const supabase = getSupabaseClient()
     const { data, error } = await supabase.from('customer').select('*').eq('id', id).single()
 
-    console.log(data)
+    if (error) {
+      return null
+    }
+    return data
+  }
+
+  async updateCustomerInfo(id: string, info: Record<string, any>) {
+    const supabase = getSupabaseClient()
+
+    const { data, error } = await supabase.from('customer').update(info).eq('id', id).select()
+
+    if (error) {
+      console.error('Update failed:', error)
+      return null
+    }
+
+    return data
+  }
+
+  async updateCustomerAddr(id: string, index: number, info: Record<string, any>) {
+    const supabase = getSupabaseClient()
+
+    const { data, error } = await supabase.from('address').update(info)
+      .eq('id', id)
+      .eq('index', index)
+      .select()
+
+    if (error) {
+      console.error('Update failed:', error)
+      return null
+    }
+
+    return data
+  }
+
+  async updateCustomerBillingAddr(id: string, index: number, info: Record<string, any>) {
+    const supabase = getSupabaseClient()
+
+    const { data, error } = await supabase.from('billing').update(info)
+      .eq('id', id)
+      .eq('index', index)
+      .select()
+
+    if (error) {
+      console.error('Update failed:', error)
+      return null
+    }
+
+    return data
+  }
+
+  async addCustomerAddr(info: Record<string, any>) {
+    const supabase = getSupabaseClient()
+
+    console.log('Inserting address:', info)
+
+    const { data, error } = await supabase.from('address').insert([info])
+
+    if (error) {
+      console.error('Update failed:', error)
+      return null
+    }
+
+    return data
+  }
+
+  async addCustomerBillingAddr(info: Record<string, any>) {
+    const supabase = getSupabaseClient()
+
+    const { data, error } = await supabase.from('billing').insert([info])
+
+    if (error) {
+      console.error('Update failed:', error)
+      return null
+    }
+
+    return data
+  }
+
+  async getAddr(id: string) {
+    const supabase = getSupabaseClient()
+    const { data, error } = await supabase.from('address').select('*').eq('id', id).order('index', { ascending: true })
 
     if (error) {
       return null
@@ -107,4 +208,51 @@ export class UsersService {
     return data
   }
 
+  async getBiilingAddr(id: string) {
+    const supabase = getSupabaseClient()
+    const { data, error } = await supabase.from('billing').select('*').eq('id', id).order('index', { ascending: true })
+
+    if (error) {
+      return null
+    }
+    return data
+  }
+
+  async deleteCustomerAddr(id: string, index: number, target: string) {
+    const supabase = getSupabaseClient()
+    const { data, error } = await supabase.from(target).delete().eq('id', id).eq('index', index)
+
+    if (error) {
+      return null
+    }
+    return data
+  }
+
+  async updateAddrSelection(id: string, index: number, target: string) {
+    const supabase = getSupabaseClient()
+
+    const { error: setTrueError } = await supabase
+      .from(target)
+      .update({ select: true })
+      .eq('id', id)
+      .eq('index', index)
+
+    const { error: setFalseError } = await supabase
+      .from(target)
+      .update({ select: false })
+      .eq('id', id)
+      .neq('index', index)
+
+    if (setTrueError || setFalseError) {
+      console.error('Update failed:', setTrueError || setFalseError)
+      return null
+    }
+
+    const { data } = await supabase
+      .from(target)
+      .select('*')
+      .eq('id', id)
+
+    return data
+  }
 }
