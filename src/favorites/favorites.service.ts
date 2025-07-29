@@ -6,7 +6,7 @@ import { FavoritesDto } from './dto/favorites.dto'
 export class FavoritesService {
   async getFavorites(user: string) {
     const supabase = getSupabaseClient()
-    const { data, error } = await supabase.from('favorites').select('*').eq('user', user).order('index', { ascending: false })
+    const { data, error } = await supabase.from('favorites').select('id, size, color').eq('user', user).order('index', { ascending: false })
     if (error) throw new Error(error.message)
     return data
   }
