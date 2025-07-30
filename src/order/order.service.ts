@@ -17,6 +17,16 @@ export class OrderService {
     return data?.[0] || null
   }
 
+  async getAllCustomerOrders() {
+    const supabase = getSupabaseClient()
+
+    const { data, error } = await supabase.from('orders').select(`*`)
+      .order('created_at', { ascending: false })
+
+    if (error) throw new Error(error.message)
+    return data || null
+  }
+
   async getThisOrder(user: string, orderId: string) {
     const supabase = getSupabaseClient()
 
@@ -82,12 +92,36 @@ export class OrderService {
     return { message: 'orders added for user' }
   }
 
-  async updateOrderStatus(orderId: string, info: ProductDto) {
+  async updateOrderStatus(userId: string, orderId: string, status: string) {
     const supabase = getSupabaseClient()
+
+    let updateData = {}
+
+    if (status === 'processing completed') {
+      updateData = {
+        status: status,
+        dateProcessingCompleted: new Date()
+      }
+    }
+
+    if (status === 'shipped') {
+      updateData = {
+        status: status,
+        dateShipped: new Date()
+      }
+    }
+
+    if (status === 'delivered') {
+      updateData = {
+        status: status,
+        dateDelivered: new Date()
+      }
+    }
 
     const { data, error } = await supabase
       .from('orders')
-      .update('')
+      .update(updateData)
+      .eq('userId', userId)
       .eq('orderId', orderId)
 
     if (error) {

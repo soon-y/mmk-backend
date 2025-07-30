@@ -21,6 +21,11 @@ export class OrderController {
     return this.OrderService.getAllOrders(user)
   }
 
+  @Get('customer')
+  async getAllCustomer() {
+    return this.OrderService.getAllCustomerOrders()
+  }
+
   @Get('this')
   async getThis(
   @Query('user') user: string,
@@ -41,9 +46,9 @@ export class OrderController {
   }
 
   @Post('update')
-  async updateOrder(
-    @Body() body: { user: string, info: ProductDto },
+  async updateOrderStatus(
+    @Body() body: { userId: string, orderId: string, status: string },
   ) {
-    return this.OrderService.updateOrderStatus(body.user, body.info)
+    return this.OrderService.updateOrderStatus(body.userId, body.orderId, body.status)
   }
 }
