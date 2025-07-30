@@ -125,6 +125,15 @@ export class UsersService {
     return data
   }
 
+  async findCustomerInfoByUserId(id: string) {
+    const supabase = getSupabaseClient()
+    const { data, error } = await supabase.from('customer').select('email, firstName, lastName').eq('id', id).single()
+    if (error) {
+      return null
+    }
+    return data
+  }
+
   async updateCustomerInfo(id: string, info: Record<string, any>) {
     const supabase = getSupabaseClient()
 
