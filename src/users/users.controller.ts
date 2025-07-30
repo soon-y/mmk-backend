@@ -5,6 +5,7 @@ import { UsersService } from './users.service'
 interface AuthenticatedRequest extends Request {
   user: {
     email: string
+    password: string
     avatar_url: string
     name: string
     created_at: Date
@@ -30,7 +31,8 @@ export class UsersController {
   @Get('me')
   @UseGuards(AuthGuard('jwt'))
   getProfile(@Request() req: AuthenticatedRequest) {
-    return req.user
+    const { password, ...safeUser } = req.user
+    return safeUser
   }
 
   @Get('customer')
@@ -43,6 +45,11 @@ export class UsersController {
   @Get()
   async getAll() {
     return this.usersService.getAllMembers()
+  }
+
+  @Get('customerInfo')
+  async findCustomerInfoByUserId(@Query('user') user: string) {
+    return this.usersService.findCustomerInfoByUserId(user)
   }
 
   @Get('address')
