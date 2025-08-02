@@ -17,8 +17,7 @@ export class BannerService {
 
     for (const file of files) {
       const idFromField = parseInt(file.fieldname.split('-')[1])
-      const ext = file.originalname.split('.').pop()
-      const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
+      const fileName = file.originalname
 
       const { error: uploadError } = await supabase.storage.from('banner-img').upload(fileName, file.buffer, {
         contentType: file.mimetype,

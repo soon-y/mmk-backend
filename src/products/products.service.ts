@@ -12,8 +12,7 @@ export class ProductsService {
     const imageUrls: string[] = []
 
     for (const file of files) {
-      const ext = file.originalname.split('.').pop()
-      const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${ext}`
+      const fileName = file.originalname
 
       const { error } = await supabase.storage
         .from('product-img')
@@ -37,6 +36,7 @@ export class ProductsService {
           name: body.name,
           category: body.category,
           price: Number(body.price),
+          discount: Number(body.discount),
           size: body.size,
           color: body.color,
           colorHex: body.colorHex,
@@ -71,12 +71,9 @@ export class ProductsService {
     const newImageUrls: string[] = []
     let imageUrls: string[] = []
 
-    console.log('exisint: ' + existingImagesUrls)
-
     if (files.length > 0) {
       for (const file of files) {
-        const ext = file.originalname.split('.').pop()
-        const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${ext}`
+        const fileName = file.originalname
 
         const { error } = await supabase.storage
           .from('product-img')
@@ -93,12 +90,13 @@ export class ProductsService {
         newImageUrls.push(data.publicUrl)
       }
     }
-    imageUrls = insertInOrder(existingImagesUrls, newImageUrls, originalOrderCount, newOrderCount,)
+    imageUrls = insertInOrder(existingImagesUrls, newImageUrls, originalOrderCount, newOrderCount)
 
     const updateData: {
       name: string
       category: string
       price: number
+      discount: number,
       size: string
       color: string
       colorHex: string
@@ -112,6 +110,7 @@ export class ProductsService {
       name: body.name,
       category: body.category,
       price: Number(body.price),
+      discount: Number(body.discount),
       size: body.size,
       color: body.color,
       colorHex: body.colorHex,
@@ -122,8 +121,6 @@ export class ProductsService {
       imagesCount: body.imagesCount,
       images: imageUrls,
     }
-
-    console.log(updateData)
 
     const { data, error } = await supabase
       .from('products')
@@ -165,7 +162,6 @@ export class ProductsService {
 
     return { message: 'Product deleted', product: data[0] }
   }
-
 }
 
 function insertInOrder<T>(
@@ -174,9 +170,7 @@ function insertInOrder<T>(
   originalCount: (string | number)[],
   newCount: (string | number)[]
 ): T[] {
-
-  console.log(originalArray)
-
+  if (!Array.isArray(originalArray)) originalArray = [originalArray]
   const result: T[] = []
   let originalIndex = 0
   let newIndex = 0
