@@ -10,6 +10,9 @@ export class ProductDto {
   @IsNumber()
   price: number
 
+  @IsNumber()
+  discount: number
+
   @IsString()
   size: string
 
