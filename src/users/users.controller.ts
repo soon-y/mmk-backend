@@ -43,13 +43,33 @@ export class UsersController {
   }
 
   @Get()
-  async getAll() {
+  async getAllMembers() {
     return this.usersService.getAllMembers()
+  }
+
+  @Get('customers')
+  async getAllCustomers() {
+    return this.usersService.getAllCustomers()
   }
 
   @Get('customerInfo')
   async findCustomerInfoByUserId(@Query('user') user: string) {
     return this.usersService.findCustomerInfoByUserId(user)
+  }
+
+  @Get('customerAddress')
+  async findCustomerAddrByUserId(@Query('user') user: string) {
+    return this.usersService.findCustomerAddrByUserId(user)
+  }
+
+  @Get('customerBillingAddress')
+  async findCustomerBillingAddrByUserId(@Query('user') user: string) {
+    return this.usersService.findCustomerBillingAddrByUserId(user)
+  }
+
+  @Get('customerOrders')
+  async findCustomerOrdersByUserId(@Query('user') user: string) {
+    return this.usersService.findCustomerOrdersByUserId(user)
   }
 
   @Get('address')

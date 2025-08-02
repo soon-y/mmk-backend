@@ -64,6 +64,12 @@ export class UsersService {
     return data
   }
 
+  async getAllCustomers() {
+    const supabase = getSupabaseClient()
+    const { data, error } = await supabase.from('customer').select('id, email, created_at, firstName, lastName, contact, payment ').order('created_at', { ascending: true })
+    if (error) throw new Error(error.message)
+    return data
+  }
 
   async findCustomerByEmail(email: string): Promise<any | null> {
     const supabase = getSupabaseClient()
@@ -127,7 +133,34 @@ export class UsersService {
 
   async findCustomerInfoByUserId(id: string) {
     const supabase = getSupabaseClient()
-    const { data, error } = await supabase.from('customer').select('email, firstName, lastName').eq('id', id).single()
+    const { data, error } = await supabase.from('customer').select('id, email, firstName, lastName, created_at, contact, payment').eq('id', id).single()
+    if (error) {
+      return null
+    }
+    return data
+  }
+
+  async findCustomerAddrByUserId(id: string) {
+    const supabase = getSupabaseClient()
+    const { data, error } = await supabase.from('address').select('*').eq('id', id).eq('select', true).single()
+    if (error) {
+      return null
+    }
+    return data
+  }
+
+  async findCustomerBillingAddrByUserId(id: string) {
+    const supabase = getSupabaseClient()
+    const { data, error } = await supabase.from('billing').select('*').eq('id', id).eq('select', true).single()
+    if (error) {
+      return null
+    }
+    return data
+  }
+
+  async findCustomerOrdersByUserId(id: string) {
+    const supabase = getSupabaseClient()
+    const { data, error } = await supabase.from('orders').select('*').eq('userId', id)
     if (error) {
       return null
     }
