@@ -136,7 +136,7 @@ export class ProductsService {
 
   async getAllProducts() {
     const supabase = getSupabaseClient()
-    const { data, error } = await supabase.from('products').select('*').order('id', { ascending: true })
+    const { data, error } = await supabase.from('products').select('*').order('id', { ascending: false })
     if (error) throw new Error(error.message)
     return data
   }
