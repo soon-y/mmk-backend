@@ -49,11 +49,11 @@ export class OrderService {
     return data
   }
 
-  async getAllOrderedProducts(user: string) {
+  async getAllOrderedProducts(user: string, orderId: string) {
     const supabase = getSupabaseClient()
 
     const { data, error } = await supabase.from('orderedProducts').select(`*`)
-      .eq('userId', user).order('id', { ascending: false })
+      .eq('userId', user).eq('orderId', orderId).order('id', { ascending: false })
 
     if (error) throw new Error(error.message)
     return data

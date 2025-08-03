@@ -6,6 +6,7 @@ import {
 import { OrderService } from './order.service'
 import { OrderDto } from './dto/order'
 import { ProductDto } from './dto/product'
+import { userInfo } from 'node:os'
 
 @Controller('Orders')
 export class OrderController {
@@ -28,14 +29,16 @@ export class OrderController {
 
   @Get('this')
   async getThis(
-  @Query('user') user: string,
-  @Query('orderId') orderId: string){
+    @Query('user') user: string,
+    @Query('orderId') orderId: string) {
     return this.OrderService.getThisOrder(user, orderId)
   }
 
   @Get('product')
-  async getAllProduct(@Query('user') user: string) {
-    return this.OrderService.getAllOrderedProducts(user)
+  async getAllProduct(
+    @Query('user') user: string,
+    @Query('orderId') orderId: string) {
+    return this.OrderService.getAllOrderedProducts(user, orderId)
   }
 
   @Post('add')
