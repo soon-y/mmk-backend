@@ -49,7 +49,16 @@ export class OrderService {
     return data
   }
 
-  async getAllOrderedProducts(user: string) {
+  async getAllOrderedProducts() {
+    const supabase = getSupabaseClient()
+
+    const { data, error } = await supabase.from('orderedProducts').select(`*`)
+
+    if (error) throw new Error(error.message)
+    return data
+  }
+
+  async getOrderedProducts(user: string) {
     const supabase = getSupabaseClient()
 
     const { data, error } = await supabase.from('orderedProducts').select(`*`)

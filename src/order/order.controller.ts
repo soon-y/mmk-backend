@@ -34,10 +34,15 @@ export class OrderController {
     return this.OrderService.getThisOrder(user, orderId)
   }
 
+  @Get('allProduct')
+  async getAllProduct(){
+    return this.OrderService.getAllOrderedProducts()
+  }
+
   @Get('product')
-  async getAllProduct(
+  async getProduct(
     @Query('user') user: string){
-    return this.OrderService.getAllOrderedProducts(user)
+    return this.OrderService.getOrderedProducts(user)
   }
 
   @Post('add')
